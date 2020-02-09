@@ -1,2 +1,26 @@
 ---
 # defaults file for Ansible-BuildNGINXUnit
+NGINX_UNIT_SRC_URL: "https://github.com/nginx/unit"
+NGINX_UNIT_VERSION: ""
+NGINX_UNIT_SRC_DIR: "/usr/src/nginx-unit"
+NGINX_UNIT_BUILD_DEPS:
+  pkg:
+    - "build-essential"
+  state: "present"
+  install_recommends: "no"
+NGINX_UNIT_INSTALL_PREFIX: "/usr/local"
+NGINX_UNIT_CONFIGURE_OPTIONS:
+  - '--prefix={{ NGINX_UNIT_INSTALL_PREFIX }}'
+  - '--state={{ NGINX_UNIT_INSTALL_PREFIX }}/lib/unit'
+  - '--control=unix:/var/run/control.unit.sock'
+  - '--pid=/var/run/unit.pid'
+  - '--log=/var/log/unit.log'
+  - '--tests'
+  - '--openssl'
+  - '--modules={{ NGINX_UNIT_INSTALL_PREFIX }}/lib/unit/modules'
+  - '--libdir={{ NGINX_UNIT_INSTALL_PREFIX }}/lib/x86_64-linux-gnu'
+NGINX_UNIT_MODULE:
+  MODULE_NAME: ""
+  CONFIGURE_OPTIONS: []
+NGINX_UNIT_CCFLAGS: "-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
+NGINX_UNIT_LDFLAGS: "-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"

@@ -1,2 +1,37 @@
 ---
 # tasks file for Ansible-BuildNGINXUnit
+- name: Checkout NGINX Unit {{ NGINX_UNIT_VERSION }}
+  git:
+    dest: "{{ NGINX_UNIT_SRC_DIR }}"
+    repo: "{{ NGINX_UNIT_SRC_URL }}"
+    version: "{{ NGINX_UNIT_VERSION }}"
+    depth: 1
+
+- name: Run NGINX Unit {{ NGINX_UNIT_VERSION }} Configure Script
+  shell: "./configure {% for OPTION in NGINX_UNIT_CONFIGURE_OPTIONS %}{{ OPTION }}{% if not loop.last %} {% endif %}{% endfor %}"
+  args:
+    executable: "/bin/bash"
+    chdir: "{{ NGINX_UNIT_SRC_DIR }}"
+  environment:
+    CFLAGS: "{{ NGINX_UNIT_CCFLAGS }}"
+    LDFLAGS: "{{ NGINX_UNIT_LDFLAGS }}"
+
+- name: Run NGINX Unit {{ NGINX_UNIT_VERSION }} Configure Script for Module
+  shell: "./configure {{ NGINX_UNIT_MODULE.MODULE_NAME }} {% for OPTION in NGINX_UNIT_MODULE.CONFIGURE_OPTIONS %}{{ OPTION }}{% if not loop.last %} {% endif %}{% endfor %}"
+  args:
+    executable: "/bin/bash"
+    chdir: "{{ NGINX_UNIT_SRC_DIR }}"
+  environment:
+    CFLAGS: "{{ NGINX_UNIT_CCFLAGS }}"
+    LDFLAGS: "{{ NGINX_UNIT_LDFLAGS }}"
+
+- name: Build and Install NGINX Unit {{ NGINX_UNIT_VERSION }}
+  shell: "{{ item }}"
+  args:
+    executable: "/bin/bash"
+    chdir: "{{ NGINX_UNIT_SRC_DIR }}"
+  with_items:
+    - "make -j{{ ansible_processor_vcpus }}"
+    - "make install"
+    - "make {{ NGINX_UNIT_MODULE.MODULE_NAME }}"
+    - "make {{ NGINX_UNIT_MODULE.MODULE_NAME }}-install"
